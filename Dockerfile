@@ -23,7 +23,7 @@ FROM gcr.io/distroless/base
 
 WORKDIR /usr/src/app
 
-COPY --from=build /app/server server
+COPY --from=build /usr/src/app/server server
 
 ENV NODE_ENV=production
 
