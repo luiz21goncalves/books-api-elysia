@@ -1,6 +1,5 @@
 FROM oven/bun:1.2.18-alpine AS build
-
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Cache packages installation
 COPY package.json package.json
@@ -22,12 +21,10 @@ RUN bun build \
 
 FROM gcr.io/distroless/base
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY --from=build /app/server server
 
 ENV NODE_ENV=production
 
 CMD ["./server"]
-
-EXPOSE 3000/tcp
