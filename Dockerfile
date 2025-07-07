@@ -1,6 +1,7 @@
-FROM oven/bun:1.2.18-alpine AS build
+FROM oven/bun:1.2.18-alpine AS base
 WORKDIR /usr/src/app
 
+FROM base AS build
 # Cache packages installation
 COPY package.json package.json
 COPY bun.lock bun.lock
@@ -19,9 +20,7 @@ RUN bun build \
 	--outfile server \
 	./src/index.ts
 
-FROM gcr.io/distroless/base
-
-WORKDIR /usr/src/app
+FROM base
 
 COPY --from=build /usr/src/app/server server
 
