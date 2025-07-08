@@ -20,7 +20,9 @@ RUN bun build \
 	--outfile server \
 	./src/index.ts
 
-FROM base
+FROM alpine:3.22.0
+
+WORKDIR /usr/src/app
 
 COPY --from=build /usr/src/app/server server
 
