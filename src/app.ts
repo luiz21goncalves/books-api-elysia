@@ -9,7 +9,7 @@ const routes = new Elysia().get(
   { response: { 200: t.Object({ message: t.String() }) } }
 )
 
-const app = new Elysia()
+export const app = new Elysia()
   .use(
     swagger({
       documentation: {
@@ -22,7 +22,3 @@ const app = new Elysia()
     })
   )
   .group('/v1', (app) => app.use(routes))
-
-app.listen({ port: Bun.env.PORT }, (server) => {
-  console.log(`🦊 Elysia is running at ${server.url.toString()}`)
-})
