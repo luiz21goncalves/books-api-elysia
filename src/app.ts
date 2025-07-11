@@ -57,3 +57,5 @@ export const app = new Elysia()
     }
   })
   .group('/v1', (app) => app.use(routes))
+
+export type APP = typeof app
