@@ -46,7 +46,7 @@ export class AppError extends Error {
   }
 }
 
-type NotFoundErrorProps = Pick<AppError, 'message'>
+type NotFoundErrorProps = Pick<AppProps, 'message'>
 
 export const notFoundErrorSchema = t.Object({
   message: t.String(),
@@ -64,7 +64,27 @@ export class NotFoundError extends AppError {
   }
 }
 
-type InternalServerErrorProps = Pick<AppError, 'cause'>
+type ValidationErrorProps = Pick<AppProps, 'message' | 'details'>
+
+export const validationErrorSchema = t.Object({
+  details: t.Array(t.Unknown()),
+  message: t.String(),
+  name: t.String({ default: 'ValidationError' }),
+  status_code: t.Number({ default: 400 }),
+})
+
+export class ValidationError extends AppError {
+  constructor({ message, details }: ValidationErrorProps) {
+    super({
+      details,
+      message,
+      name: 'ValidationError',
+      statusCode: 400,
+    })
+  }
+}
+
+type InternalServerErrorProps = Pick<AppProps, 'cause'>
 
 export const internalServerErrorSchema = t.Object({
   message: t.String(),

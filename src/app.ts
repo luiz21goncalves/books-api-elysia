@@ -5,6 +5,8 @@ import {
   internalServerErrorSchema,
   NotFoundError,
   notFoundErrorSchema,
+  ValidationError,
+  validationErrorSchema,
 } from './errors'
 
 const routes = new Elysia().get(
@@ -15,6 +17,7 @@ const routes = new Elysia().get(
   {
     response: {
       200: t.Object({ message: t.String() }),
+      400: validationErrorSchema,
       404: notFoundErrorSchema,
       500: internalServerErrorSchema,
     },
@@ -34,27 +37,31 @@ export const app = new Elysia()
     })
   )
   .onError(({ code, error, status, request, path }) => {
-    switch (code) {
-      case 'NOT_FOUND': {
-        const notFoundError = new NotFoundError({
-          message: `${request.method}:${path} not found.`,
-        })
-        console.info(notFoundError)
+    if (code === 'NOT_FOUND') {
+      const notFoundError = new NotFoundError({
+        message: `${request.method}:${path} not found.`,
+      })
+      const errorResponse = notFoundError.toResponse()
 
-        const errorResponse = notFoundError.toResponse()
-
-        return status(errorResponse.status_code, errorResponse)
-      }
-
-      default: {
-        const internalError = new InternalServerError({ cause: error })
-        console.info(internalError)
-
-        const errorResponse = internalError.toResponse()
-
-        return status(errorResponse.status_code, errorResponse)
-      }
+      return status(errorResponse.status_code, errorResponse)
     }
+
+    if (code === 'VALIDATION') {
+      const validationError = new ValidationError({
+        details: error.all,
+        message: `Validation error on ${error.type}`,
+      })
+      const errorResponse = validationError.toResponse()
+
+      return status(errorResponse.status_code, errorResponse)
+    }
+
+    const internalError = new InternalServerError({ cause: error })
+    console.info(internalError)
+
+    const errorResponse = internalError.toResponse()
+
+    return status(errorResponse.status_code, errorResponse)
   })
   .group('/v1', (app) => app.use(routes))
 
