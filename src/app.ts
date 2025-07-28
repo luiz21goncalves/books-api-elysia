@@ -8,6 +8,7 @@ import {
   ValidationError,
   validationErrorSchema,
 } from './errors'
+import { swagger } from './swagger'
 
 const routes = new Elysia().get(
   '/',
@@ -25,17 +26,7 @@ const routes = new Elysia().get(
 )
 
 export const app = new Elysia()
-  .use(
-    swagger({
-      documentation: {
-        servers: [
-          { url: `http://localhost:${Bun.env.PORT}` },
-          { url: 'https://books-api-elysia.onrender.com' },
-        ],
-      },
-      path: '/docs',
-    })
-  )
+  .use(swagger)
   .onError(({ code, error, status, request, path }) => {
     if (code === 'NOT_FOUND') {
       const notFoundError = new NotFoundError({
