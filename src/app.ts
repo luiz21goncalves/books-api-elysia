@@ -1,4 +1,4 @@
-import swagger from '@elysiajs/swagger'
+import { sleep } from 'bun'
 import { Elysia, t } from 'elysia'
 import {
   InternalServerError,
@@ -9,10 +9,13 @@ import {
   validationErrorSchema,
 } from './errors'
 import { swagger } from './swagger'
+import { tracing } from './tracing'
 
 const routes = new Elysia().get(
   '/',
-  () => {
+  async () => {
+    await sleep(Math.random() * 1000)
+
     return { message: 'Hello Elysia' }
   },
   {
@@ -27,6 +30,7 @@ const routes = new Elysia().get(
 
 export const app = new Elysia()
   .use(swagger)
+  .use(tracing)
   .onError(({ code, error, status, request, path }) => {
     if (code === 'NOT_FOUND') {
       const notFoundError = new NotFoundError({
